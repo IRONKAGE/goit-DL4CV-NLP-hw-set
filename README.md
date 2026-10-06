@@ -69,11 +69,17 @@ goit-DL4CV-NLP-hw-set/
 │
 ├── notebooks_eda/              # 📊 Інтерактивні Marimo-скрипти розвідувального аналізу (EDA)
 │   ├── hw_01_eda.py            # 🏗️ Аналіз рецептур бетону (Кореляційні матриці, Слайдери віку)
+│   ├── hw_02_eda.py            # 🖼️ Аналіз зображень пейзажів Intel (Розподіл класів, Зразки)
 │
 ├── hw_01_concrete/             # 🏗️ Проект 1: Concrete Strength Prediction (Регресія)
 │   ├── data_adapter.py         # 🗃️ Конвертер Polars DataFrame у PyTorch DataLoader зі StandardScaler
 │   ├── model.py                # 🧠 Архітектура багатошарового перцептрона (Feed-Forward NN) з Dropout
-│   └── train.py                # 🚂 Тренувальний цикл, генерація шаблонів висновків та оцінка MSE/MAE/R2
+│   └── ui_labels.py            # 🌍 Локалізація наборів даних для UI
+│
+├── hw_02_intel_cv/             # 🖼️ Проект 2: Intel Image Classification (Computer Vision)
+│   ├── data_adapter.py         # 🗃️ DataLoader з аугментаціями (RandomResizedCrop, ColorJitter) та Train/Val Split
+│   ├── model.py                # 🧠 Transfer Learning на базі ResNet18 (заморожування вагів, нова FC-голова)
+│   └── ui_labels.py            # 🌍 Локалізація наборів даних для UI
 │
 ├── models/                     # 📦 Директорія згенерованих артефактів (матриці плутанини, ROC-криві, best_model.pt)
 │   └── .gitkeep                # ⚠️ Маркер для збереження директорії у системі контролю версій Git
@@ -95,6 +101,7 @@ goit-DL4CV-NLP-hw-set/
 
 - **MLOps Core (`/core`):** Архітектурне ядро. Включає автоматичну детекцію обладнання (`hardware.py`), яка змушує нейромережі працювати на максимумі як на RTX Pro 6000, так і на Apple M5 Max. Універсальний `BaseTrainer` стандартизує логування в MLflow та бере на себе рутину з Early Stopping.
 - **Concrete Strength (`HW 01`):** Регресійна задача на табличних даних. Розробка глибокого багатошарового перцептрона (MLP) з використанням `StandardScaler` для прогнозування міцності бетону (оцінка за MSE, MAE та R²).
+- **Intel Image Classification (`HW 02`):** Задачі класифікації зображень з використанням комп'ютерного зору. Застосування техніки Transfer Learning на базі попередньо навченої моделі ResNet18 з налаштуванням аугментацій (RandomResizedCrop, ColorJitter).
 
 ## 🪬 Швидкий старт
 

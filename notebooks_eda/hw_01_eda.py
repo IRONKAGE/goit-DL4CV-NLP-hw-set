@@ -155,7 +155,7 @@ def correlation_heatmap(
     sch,
     ssd,
 ):
-    # Конвертуємо Polars у Pandas, оскільки df_raw.select_dtypes() з вашого сніпету — це синтаксис Pandas
+    # Конвертуємо Polars у Pandas
     df_pd = df_raw.to_pandas()
 
     # 1. Рахуємо кореляцію тільки для числових колонок
@@ -319,7 +319,6 @@ def interactive_scatter(
             ax=ax_scatter_eda
         )
 
-        # Прибрали .upper(), оскільки назви вже гарно відформатовані з одиницями виміру
         plt.title(f"Вплив компонента «{dropdown.value}» на міцність бетону", fontsize=14)
         plt.tight_layout()
 
@@ -393,7 +392,15 @@ def train_model(
     optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-4)
 
     epochs_count = 150
-    trainer = BaseTrainer(model, optimizer, criterion, device, run_name="marimo_run")
+    # Інтеграція експерименту MLflow у новий BaseTrainer
+    trainer = BaseTrainer(
+        model=model,
+        optimizer=optimizer,
+        criterion=criterion,
+        device=device,
+        experiment_name="concrete_strength",
+        run_name="marimo_run"
+    )
 
     # Інтерактивний Progress Bar у стилі Windows XP
     with mo.status.progress_bar(
@@ -410,7 +417,7 @@ def train_model(
                 subtitle=f"💎 <b>Engine:</b> {device_name} <br/>☣️ <b>Епоха:</b> {epoch}/{epochs_count} | 📉 <b>Train MSE:</b> {t_loss:.1f} | 📈 <b>Val MSE:</b> {v_loss:.1f}"
             )
 
-        # Передаємо callback у тренер
+        # ВИПРАВЛЕНО: Прибрано verbose_console=False, щоб відповідати еталонному BaseTrainer
         history = trainer.fit(
             train_loader,
             val_loader,

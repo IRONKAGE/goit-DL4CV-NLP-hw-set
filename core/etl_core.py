@@ -379,11 +379,11 @@ class SecureDownloader:
         elif os.path.exists(self.zip_path) and self.is_valid_zip():
             logger.info("✅ Завантаження архіву завершено успішно!")
 
-    def extract_atomically(self, target_extensions=('.csv', '.json', '.dat'), expected_filename="data.csv"):
-        """Атомарне розпакування з Flattening (вирівнюванням директорій) та TQDM прогресом"""
+    def extract_atomically(self, target_extensions=('.csv', '.json', '.dat', '.jpg', '.jpeg', '.png'), expected_filename="data.csv"):
+        """Атомарне розпакування з єдиним TQDM прогресом ТА ЗБЕРЕЖЕННЯМ СТРУКТУРИ ПАПОК"""
         # Логіка ідемпотентності
         target_file = os.path.join(self.data_dir, expected_filename)
-        if os.path.exists(target_file):
+        if os.path.exists(target_file) and expected_filename != "data.csv":
             return [target_file]
 
         if not self.is_valid_zip():
@@ -398,40 +398,35 @@ class SecureDownloader:
             if not data_files:
                 raise Exception(f"В архіві немає файлів з розширеннями {target_extensions}!")
 
-            for file_in_zip in data_files:
-                # Flattening: ігноруємо вкладені папки всередині ZIP
-                final_path = os.path.join(self.data_dir, os.path.basename(file_in_zip))
-                tmp_extract_path = final_path + ".tmp_extract"
+            with tqdm(total=len(data_files), unit='файл', desc="📦 Розпакування", file=sys.stdout, leave=False) as pbar:
+                for file_in_zip in data_files:
+                    final_path = os.path.join(self.data_dir, file_in_zip)
 
-                if os.path.exists(final_path):
-                    logger.info(f"⚡ Файл '{os.path.basename(final_path)}' вже готовий. Пропускаємо...")
-                    extracted_files.append(final_path)
-                    continue
+                    # Створюємо вкладені папки (напр. seg_train/buildings), якщо їх немає
+                    os.makedirs(os.path.dirname(final_path), exist_ok=True)
 
-                try:
-                    # Отримуємо розмір стиснутого файлу для прогрес-бару
-                    file_size = zip_ref.getinfo(file_in_zip).file_size
+                    tmp_extract_path = final_path + ".tmp_extract"
 
-                    with zip_ref.open(file_in_zip) as source, open(tmp_extract_path, "wb") as target:
-                        # Інтеграція TQDM для процесу розпакування
-                        with tqdm(total=file_size, unit='iB', unit_scale=True, desc=f"   ⚙️ Витягуємо {os.path.basename(file_in_zip)}", file=sys.stdout) as pbar:
-                            while True:
-                                buffer = source.read(8192)
-                                if not buffer:
-                                    break
-                                target.write(buffer)
-                                pbar.update(len(buffer))
+                    if os.path.exists(final_path):
+                        extracted_files.append(final_path)
+                        pbar.update(1)
+                        continue
 
-                    os.replace(tmp_extract_path, final_path) # Атомарний коміт на диск
-                    extracted_files.append(final_path)
+                    try:
+                        with zip_ref.open(file_in_zip) as source, open(tmp_extract_path, "wb") as target:
+                            shutil.copyfileobj(source, target)
 
-                except Exception as extract_err:
-                    raise Exception(f"Помилка фізичного запису на диск: {extract_err}")
-                finally:
-                    if os.path.exists(tmp_extract_path):
-                        os.remove(tmp_extract_path)
+                        os.replace(tmp_extract_path, final_path) # Атомарний коміт на диск
+                        extracted_files.append(final_path)
+                        pbar.update(1)
 
-        logger.info("✅ Успіх! Файли витягнуто безпечно!")
+                    except Exception as extract_err:
+                        raise Exception(f"Помилка фізичного запису на диск: {extract_err}")
+                    finally:
+                        if os.path.exists(tmp_extract_path):
+                            os.remove(tmp_extract_path)
+
+        logger.info("✅ Успіх! Файли витягнуто безпечно зі збереженням структури!")
         return extracted_files
 
 

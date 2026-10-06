@@ -85,6 +85,17 @@ class BaseTrainer:
         mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "sqlite:///mlruns/mlruns.db"))
         mlflow.set_experiment(self.experiment_name)
 
+    # Рекурсивний перенос на пристрій для мультимодальних даних (Списки/Словники)
+    def _to_device(self, data):
+        """Рекурсивно переносить тензори, списки, кортежі або словники на пристрій."""
+        if isinstance(data, torch.Tensor):
+            return data.to(self.device)
+        elif isinstance(data, (list, tuple)):
+            return [self._to_device(x) for x in data]
+        elif isinstance(data, dict):
+            return {k: self._to_device(v) for k, v in data.items()}
+        return data
+
     def train_epoch(self, dataloader: DataLoader) -> float:
         """Виконує одну епоху навчання."""
         self.model.train()
@@ -92,7 +103,9 @@ class BaseTrainer:
 
         progress_bar = tqdm(dataloader, desc="Тренування", leave=False)
         for batch_x, batch_y in progress_bar:
-            batch_x, batch_y = batch_x.to(self.device), batch_y.to(self.device)
+            # Використання безпечного переносу (замість batch_x.to(self.device))
+            batch_x = self._to_device(batch_x)
+            batch_y = self._to_device(batch_y)
 
             self.optimizer.zero_grad()
             # Вирівнюємо розмірність [batch_size, 1] -> [batch_size] для MSELoss
@@ -102,10 +115,11 @@ class BaseTrainer:
             loss.backward()
             self.optimizer.step()
 
-            total_loss += loss.item()
+            # batch_y.size(0) безпечніше за batch_x.size(0) на випадок мультимодального масиву
+            total_loss += loss.item() * batch_y.size(0)
             progress_bar.set_postfix({"loss": f"{loss.item():.4f}"})
 
-        return total_loss / len(dataloader)
+        return total_loss / len(dataloader.dataset)
 
     @torch.no_grad()
     def validate_epoch(self, dataloader: DataLoader) -> float:
@@ -114,12 +128,15 @@ class BaseTrainer:
         total_loss = 0.0
 
         for batch_x, batch_y in dataloader:
-            batch_x, batch_y = batch_x.to(self.device), batch_y.to(self.device)
+            batch_x = self._to_device(batch_x)
+            batch_y = self._to_device(batch_y)
+
             predictions = self.model(batch_x).squeeze(-1)
             loss = self.criterion(predictions, batch_y)
-            total_loss += loss.item()
 
-        return total_loss / len(dataloader)
+            total_loss += loss.item() * batch_y.size(0)
+
+        return total_loss / len(dataloader.dataset)
 
     def fit(
         self,

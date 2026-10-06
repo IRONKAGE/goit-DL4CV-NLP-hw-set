@@ -39,7 +39,23 @@ def set_global_seed(seed: int = None) -> None:
 
     # 3. Фіксація NumPy (використовується в Pandas, Polars та Scikit-Learn)
     np.random.seed(seed)
-    logger.info(f"🌱 Базовий seed зафіксовано: {seed} (Python, NumPy)")
+
+    # 4. Фіксація глобального PyTorch (страховка)
+    try:
+        import torch
+        torch.manual_seed(seed)
+    except ImportError:
+        pass
+
+    # 5. Фіксація TensorFlow (Критично для tf.data)
+    try:
+        import tensorflow as tf
+        tf.random.set_seed(seed)
+        os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+    except ImportError:
+        pass
+
+    logger.info(f"🌱 Базовий seed зафіксовано: {seed} (Python, NumPy, Torch, TF)")
 
 # ------------------------------------------------------------------------------
 # 2. УЛЬТИМАТИВНИЙ МАРШРУТИЗАТОР ОБЧИСЛЮВАЛЬНИХ ПОТУЖНОСТЕЙ

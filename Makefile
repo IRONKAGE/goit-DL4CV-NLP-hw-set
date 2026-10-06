@@ -54,7 +54,7 @@ RED := \033[31m
 PURPLE := \033[35m
 RESET := \033[0m
 
-.PHONY: help check-resources setup clean deep-clean mlflow train-hw1 train-hw2 train-hw3 train-hw4 train-hw5 train-fp eda-hw1 eda-hw2 eda-hw3 eda-hw4 eda-hw5 eda-fp
+.PHONY: help check-resources setup clean deep-clean mlflow run-hw1 run-hw2 run-hw3 run-hw4 run-hw5 run-fp
 
 # Дефолтна ціль
 help:
@@ -68,21 +68,13 @@ help:
 	@echo "  $(GREEN)make clean$(RESET)        - 🧹 Очистити кеш (pycache, ruff, marimo)"
 	@echo "  $(GREEN)make deep-clean$(RESET)   - 🧨 ПОВНЕ очищення: видалити середовище та артефакти"
 	@echo ""
-	@echo "$(YELLOW)📡 Команди навчання моделей (Train Pipelines):$(RESET)"
-	@echo "  $(CYAN)make train-hw1$(RESET)    - 🏗️  ДЗ 1: MLP Регресія (Concrete Strength)"
-	@echo "  $(CYAN)make train-hw2$(RESET)    - 🖼️  ДЗ 2: CV Класифікація (Intel Image, ResNet18)"
-	@echo "  $(CYAN)make train-hw3$(RESET)    - 🛋️  ДЗ 3: CV Детекція (Indoor Objects, YOLOv9)"
-	@echo "  $(CYAN)make train-hw4$(RESET)    - 📧 ДЗ 4: NLP Класифікація (Spam, GloVe/TF-IDF)"
-	@echo "  $(CYAN)make train-hw5$(RESET)    - 🌍 ДЗ 5: NLP Переклад (Seq2Seq, Attention Heatmaps)"
-	@echo "  $(CYAN)make train-fp$(RESET)     - 🐶🐱 ФП: Multimodal Ensemble (PetFinder.my Kaggle)"
-	@echo ""
-	@echo "$(YELLOW)📊 Команди аналітики (Marimo EDA):$(RESET)"
-	@echo "  $(PURPLE)make eda-hw1$(RESET)      - 🏗️  Аналіз набору даних рецептур бетону"
-	@echo "  $(PURPLE)make eda-hw2$(RESET)      - 🖼️  Аналіз набору даних зображень пейзажів Intel"
-	@echo "  $(PURPLE)make eda-hw3$(RESET)      - 🛋️  Візуалізація Bounding Boxes YOLO"
-	@echo "  $(PURPLE)make eda-hw4$(RESET)      - 📧 Статистичний NLP-аналіз токенів (Spam)"
-	@echo "  $(PURPLE)make eda-hw5$(RESET)      - 🌍 Аналіз паралельного корпусу мов"
-	@echo "  $(PURPLE)make eda-fp$(RESET)       - 🐶🐱 Мультимодальний аналіз PetFinder"
+	@echo "$(YELLOW)🚀 Універсальні Дашборди (Навчання + Аналітика):$(RESET)"
+	@echo "  $(PURPLE)make run-hw1$(RESET)      - 🏗️  ДЗ 1: Прогнозування міцності бетону (MLP Регресія)"
+	@echo "  $(PURPLE)make run-hw2$(RESET)      - 🖼️  ДЗ 2: Класифікація пейзажів Intel (ResNet18)"
+	@echo "  $(PURPLE)make run-hw3$(RESET)      - 🛋️  ДЗ 3: Детекція кімнатних об'єктів (YOLO26s NMS-Free)"
+	@echo "  $(PURPLE)make run-hw4$(RESET)      - 📧 ДЗ 4: Фільтрація спаму (GloVe / TF-IDF)"
+	@echo "  $(PURPLE)make run-hw5$(RESET)      - 🌍 ДЗ 5: Машинний переклад EN-EL (Seq2Seq Attention)"
+	@echo "  $(PURPLE)make run-fp$(RESET)       - 🐶🐱 ФП: PetFinder (TF Data + Keras Late Fusion)"
 	@echo "$(CYAN)================================================================================$(RESET)"
 
 # ------------------------------------------------------------------------------
@@ -136,61 +128,34 @@ mlflow:
 	PYTHONPATH=. $(UV) run mlflow ui --host 127.0.0.1 --port 5000
 
 # ------------------------------------------------------------------------------
-# 6. ЗАПУСК НАВЧАННЯ НЕЙРОМЕРЕЖ (TRAIN PIPELINES)
+# 6. ЗАПУСК MLOPS ДАШБОРДІВ (MARIMO) - Тренування + EDA в одному вікні
 # ------------------------------------------------------------------------------
-train-hw1:
-	@echo "$(CYAN)🏗️ Запуск навчання: HW 01 (Concrete Strength MLP)...$(RESET)"
-	PYTHONPATH=. $(UV) run python -m hw_01_concrete.train
-
-train-hw2:
-	@echo "$(CYAN)🖼️ Запуск навчання: HW 02 (Intel Image ResNet18)...$(RESET)"
-	PYTHONPATH=. $(UV) run python -m hw_02_intel_cv.train
-
-train-hw3:
-	@echo "$(CYAN)🛋️ Запуск навчання: HW 03 (Indoor Objects YOLOv9)...$(RESET)"
-	PYTHONPATH=. $(UV) run python -m hw_03_indoor_yolo.train
-
-train-hw4:
-	@echo "$(CYAN)📧 Запуск навчання: HW 04 (Spam Detection NLP)...$(RESET)"
-	PYTHONPATH=. $(UV) run python -m hw_04_spam_nlp.train
-
-train-hw5:
-	@echo "$(CYAN)🌍 Запуск навчання: HW 05 (Machine Translation Seq2Seq)...$(RESET)"
-	PYTHONPATH=. $(UV) run python -m hw_05_translation.train
-
-train-fp:
-	@echo "$(CYAN)🚀 Запуск навчання: Фінальний Проект (Multimodal Ensemble)...$(RESET)"
-	PYTHONPATH=. $(UV) run python -m hw_06_petfinder_fp.train
-
-# ------------------------------------------------------------------------------
-# 7. ЗАПУСК РОЗВІДУВАЛЬНОГО АНАЛІЗУ (MARIMO EDA)
-# ------------------------------------------------------------------------------
-eda-hw1:
-	@echo "$(PURPLE)📊 Відкриття EDA дашборду для HW 01...$(RESET)"
+run-hw1:
+	@echo "$(PURPLE)📊 Відкриття дашборду HW 01 (Міцність бетону)...$(RESET)"
 	PYTHONPATH=. $(UV) run marimo edit notebooks_eda/hw_01_eda.py
 
-eda-hw2:
-	@echo "$(PURPLE)📊 Відкриття EDA дашборду для HW 02...$(RESET)"
+run-hw2:
+	@echo "$(PURPLE)📊 Відкриття дашборду HW 02 (Intel Image Classification)...$(RESET)"
 	PYTHONPATH=. $(UV) run marimo edit notebooks_eda/hw_02_eda.py
 
-eda-hw3:
-	@echo "$(PURPLE)📊 Відкриття EDA дашборду для HW 03...$(RESET)"
+run-hw3:
+	@echo "$(PURPLE)📊 Відкриття дашборду HW 03 (YOLO Indoor Object Detection)...$(RESET)"
 	PYTHONPATH=. $(UV) run marimo edit notebooks_eda/hw_03_eda.py
 
-eda-hw4:
-	@echo "$(PURPLE)📊 Відкриття EDA дашборду для HW 04...$(RESET)"
+run-hw4:
+	@echo "$(PURPLE)📊 Відкриття дашборду HW 04 (NLP Spam Detection)...$(RESET)"
 	PYTHONPATH=. $(UV) run marimo edit notebooks_eda/hw_04_eda.py
 
-eda-hw5:
-	@echo "$(PURPLE)📊 Відкриття EDA дашборду для HW 05...$(RESET)"
+run-hw5:
+	@echo "$(PURPLE)📊 Відкриття дашборду HW 05 (Machine Translation Seq2Seq)...$(RESET)"
 	PYTHONPATH=. $(UV) run marimo edit notebooks_eda/hw_05_eda.py
 
-eda-fp:
-	@echo "$(PURPLE)📊 Відкриття EDA дашборду для Фінального Проекту...$(RESET)"
-	PYTHONPATH=. $(UV) run marimo edit notebooks_eda/hw_06_eda.py
+run-fp:
+	@echo "$(PURPLE)📊 Відкриття дашборду Фінального Проєкту (PetFinder)...$(RESET)"
+	PYTHONPATH=. $(UV) run marimo edit notebooks_eda/hw_fp_eda.py
 
 # ------------------------------------------------------------------------------
-# 8. ОЧИЩЕННЯ СМІТТЯ ТА КЕШІВ
+# 7. ОЧИЩЕННЯ СМІТТЯ ТА КЕШІВ
 # ------------------------------------------------------------------------------
 clean:
 	@echo "$(YELLOW)🧹 Очищення тимчасових файлів та кешу...$(RESET)"
