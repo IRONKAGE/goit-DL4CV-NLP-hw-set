@@ -9,7 +9,7 @@ dependencies = [
     # ==========================================
     # 1. Deep Learning & AI Frameworks
     # ==========================================
-    # ⚠️ АРХІТЕКТУРНЕ РІШЕННЯ: Динамічна маршрутизація версій PyTorch
+    # ⚠️ АРХІТЕКТУРНЕ РІШЕННЯ 1: Динамічна маршрутизація версій PyTorch
     # Для Apple Silicon, Windows та Linux встановлюється найновіша версія (2.14.1)
     "torch==2.14.1 ; sys_platform != 'darwin' or platform_machine != 'x86_64'",
     "torchvision==0.29.1 ; sys_platform != 'darwin' or platform_machine != 'x86_64'",
@@ -21,12 +21,26 @@ dependencies = [
     "ultralytics==8.4.172", # SOTA-фреймворк для детекції об'єктів та сегментації (YOLOv8/YOLOv9)
     "gensim==4.4.0",        # Векторне моделювання семантики текстів (Word2Vec/GloVe ембедінги)
 
+    # ⚠️ АРХІТЕКТУРНЕ РІШЕННЯ 2: Динамічна маршрутизація версій TensorFlow
+    # Для Apple Silicon, Windows та Linux використовуємо найновішу версію
+    "tensorflow==2.21.0 ; sys_platform != 'darwin' or platform_machine != 'x86_64'",
+    # Для Legacy-систем macOS на базі Intel (x86_64) фіксуємо останній існуючий реліз 2.16.2
+    "tensorflow==2.16.2 ; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+
+    # ⚠️ АРХІТЕКТУРНЕ РІШЕННЯ 3: Синхронізація Keras 3 із версіями PyTorch
+    # Для сучасних систем (PyTorch 2.14+) беремо останній Keras
+    "keras==3.15.1 ; sys_platform != 'darwin' or platform_machine != 'x86_64'",
+    # Для Mac Intel (PyTorch 2.2.2) фіксуємо останню сумісну версію без flatten_with_keys_fn
+    "keras==3.3.3 ; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+
     # ==========================================
     # 2. Data Processing & EDA (Memory Optimized)
     # ==========================================
     "polars==1.44.2",       # Надшвидкий рушій (Rust). Нативний стандарт для обробки табличних даних
+    "pandas==2.3.3",        # Класичний стандарт для маніпуляцій з DataFrames та генерації Kaggle-сабмішенів
     "pyarrow==24.0.0",      # Високопродуктивний бекенд пам'яті для Pandas/Polars
     "numpy==1.26.4",        # Математичне ядро (LTS-версія для стабільності C++ компіляторів)
+    "scipy==1.16.3",        # "Мостова" версія: сумісна зі старим NumPy 1.x для оптимізації порогів Nelder-Mead (QWK метрика)
     "scikit-learn==1.9.1",  # Класичні метрики, векторизатори (TF-IDF, BoW) та спліти даних
     "pillow==12.3.0",       # Високопродуктивна бібліотека для піксельних маніпуляцій зображень
     "tqdm==4.70.1",         # Моніторинг прогресу виконання важких циклів та завантажень (CLI/GUI)
@@ -48,6 +62,13 @@ dependencies = [
     "fastapi==0.142.2",     # Сучасний асинхронний фреймворк для створення ML API
     "uvicorn==0.54.0",      # ASGI-сервер для запуску FastAPI на високих швидкостях
     "pydantic==2.13.5",     # Сувора валідація вхідних даних (JSON) для моделей
+
+    # ==========================================
+    # 5. HuggingFace & Transformers (Text & Vision)
+    # ==========================================
+    "transformers==5.0.0",  # SOTA-моделі (CLIP, E5, MiniLM) сумісні з torch 2.2.2
+    "sentencepiece==0.2.2", # Необхідно для токенізаторів багатьох багатомовних моделей
+    "safetensors==0.8.0",   # Швидке та безпечне завантаження ваг замість pickle
 ]
 
 [project.optional-dependencies]

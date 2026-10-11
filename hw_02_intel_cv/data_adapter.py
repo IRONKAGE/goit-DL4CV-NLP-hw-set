@@ -1,5 +1,6 @@
 import os
 import logging
+import copy
 from typing import Tuple, List
 
 import torch
@@ -71,7 +72,11 @@ def get_image_dataloaders(
         generator=torch.Generator().manual_seed(seed)
     )
 
-    # Вимикаємо аугментацію для валідації (технічний хак PyTorch)
+    # Робимо глибоку копію базового набору даних виключно для валідаційної вибірки.
+    # Тепер train_dataset і val_dataset незалежні в пам'яті.
+    val_dataset.dataset = copy.deepcopy(full_train_dataset)
+
+    # Безпечно вимикаємо аугментацію для валідації (тренувальний набір даних не постраждає)
     val_dataset.dataset.transform = test_transform
 
     # 5. Створення DataLoaders

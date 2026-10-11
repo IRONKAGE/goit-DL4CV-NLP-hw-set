@@ -54,7 +54,7 @@ RED := \033[31m
 PURPLE := \033[35m
 RESET := \033[0m
 
-.PHONY: help check-resources setup clean deep-clean mlflow run-hw1 run-hw2 run-hw3 run-hw4 run-hw5 run-fp
+.PHONY: help check-resources setup clean deep-clean mlflow run-hw1 run-hw2 run-hw3 run-hw4 run-hw5 run-fp fp-data fp-features
 
 # Дефолтна ціль
 help:
@@ -74,7 +74,8 @@ help:
 	@echo "  $(PURPLE)make run-hw3$(RESET)      - 🛋️  ДЗ 3: Детекція кімнатних об'єктів (YOLO26s NMS-Free)"
 	@echo "  $(PURPLE)make run-hw4$(RESET)      - 📧 ДЗ 4: Фільтрація спаму (GloVe / TF-IDF)"
 	@echo "  $(PURPLE)make run-hw5$(RESET)      - 🌍 ДЗ 5: Машинний переклад EN-EL (Seq2Seq Attention)"
-	@echo "  $(PURPLE)make run-fp$(RESET)       - 🐶🐱 ФП: PetFinder (TF Data + Keras Late Fusion)"
+	@echo "  $(PURPLE)make run-fp$(RESET)       - 🐶🐱 ФП: PetFinder (TF+PyTorch→Keras3 LateFusion→Stacking)"
+	@echo "  $(PURPLE)make fp-features$(RESET)  - 🏭 ФП (Опційно): Завантажити дані й порахувати кеш ознак"
 	@echo "$(CYAN)================================================================================$(RESET)"
 
 # ------------------------------------------------------------------------------
@@ -151,8 +152,19 @@ run-hw5:
 	PYTHONPATH=. $(UV) run marimo edit notebooks_eda/hw_05_eda.py
 
 run-fp:
-	@echo "$(PURPLE)📊 Відкриття дашборду Фінального Проєкту (PetFinder)...$(RESET)"
+	@echo "$(PURPLE)📊 Відкриття дашборду Фінального Проекту (PetFinder)...$(RESET)"
 	PYTHONPATH=. $(UV) run marimo edit notebooks_eda/hw_fp_eda.py
+
+# ------------------------------------------------------------------------------
+# 6b. ФП: ОПЦІЙНИЙ ПРОГРІВ КЕШУ (не обов'язковий: ноутбук робить те саме сам)
+# ------------------------------------------------------------------------------
+fp-data:
+	@echo "$(PURPLE)📥 ФП: завантаження приватного змагання (пропускається, якщо дані вже є)...$(RESET)"
+	PYTHONPATH=. $(UV) run python -c "from hw_fp_kaggle_petfinder import data_adapter as da; da.ensure_data()"
+
+fp-features: fp-data
+	@echo "$(PURPLE)🏭 ФП: екстракція ознак (TF EfficientNetV2 → PyTorch CLIP → E5/MiniLM). Кеш: data/hw_fp/features/$(RESET)"
+	PYTHONPATH=. $(UV) run python -m hw_fp_kaggle_petfinder.extractors all
 
 # ------------------------------------------------------------------------------
 # 7. ОЧИЩЕННЯ СМІТТЯ ТА КЕШІВ
