@@ -71,6 +71,7 @@ goit-DL4CV-NLP-hw-set/
 ├── notebooks_eda/              # 📊 Інтерактивні Marimo-скрипти розвідувального аналізу (EDA)
 │   ├── hw_01_eda.py            # 🏗️ Аналіз рецептур бетону (Кореляційні матриці, Слайдери віку)
 │   ├── hw_02_eda.py            # 🖼️ Аналіз зображень пейзажів Intel (Розподіл класів, Зразки)
+│   ├── hw_03_eda.py            # 🛋️ Інтерактивний рендер Bounding Boxes з YOLO-розмітки
 │   ├── hw_04_eda.py            # 📧 Аналіз дисбалансу, порівняння NLP-векторизаторів та інтерактивне Demo
 │   ├── hw_05_eda.py            # 🌍 Аналіз паралельного корпусу (Source/Target Sentence Length)
 │   └── hw_fp_eda.py            # 🐶 Мультимодальний пайплайн (Tri-Framework: TF ⟷ PyTorch ⟷ Keras 3)
@@ -84,6 +85,11 @@ goit-DL4CV-NLP-hw-set/
 │   ├── data_adapter.py         # 🗃️ DataLoader з аугментаціями (RandomResizedCrop, ColorJitter) та Train/Val Split
 │   ├── model.py                # 🧠 Transfer Learning на базі ResNet18 (заморожування вагів, нова FC-голова)
 │   └── ui_labels.py            # 🌍 Локалізація наборів даних для UI
+│
+├── hw_03_indoor_objects/       # 🛋️ Проект 3: Indoor Objects Detection (YOLO26)
+│   ├── analysis.py             # 📐 Логіка обчислення метрик по класах, діагностики кривих та генерації висновків
+│   ├── data_adapter.py         # 🗃️ Валідатор набору даних та автоматичний патчер абсолютних шляхів у data.yaml
+│   └── ui_labels.py            # 🌍 Локалізація назв класів для інтерактивних графіків Plotly
 │
 ├── hw_04_spam_nlp/             # 📧 Проект 4: Spam Detection (NLP Comparative Study)
 │   ├── data_adapter.py         # 🗃️ Векторизація тексту (BoW, TF-IDF) та завантаження ембедінгів GloVe Word2Vec
@@ -112,6 +118,10 @@ goit-DL4CV-NLP-hw-set/
 ├── mlruns/                     # 📊 База даних MLflow (історія Loss, гіперпараметрів та вагів моделей)
 │   └── .gitkeep                # ⚠️ Маркер для збереження директорії у системі контролю версій Git
 │
+├── runs/                       # Результати тренування Ultralytics YOLO (артефакти, графіки, args.yaml)
+
+│   └── .gitkeep                # ⚠️ Маркер для збереження директорії у системі контролю 
+│
 ├── etl_pipeline.log            # 📝 Логи виконання процесів екстракції та трансформації даних
 ├── .editorconfig               # 📝 Стандарти форматування коду для командної розробки
 ├── .env                        # 🔐 Локальні змінні середовища (креденшнли, конфіги — ігнорується Git)
@@ -127,6 +137,7 @@ goit-DL4CV-NLP-hw-set/
 - **MLOps Core (`/core`):** Архітектурне ядро. Включає автоматичну детекцію обладнання (`hardware.py`), яка змушує нейромережі працювати на максимумі як на RTX Pro 6000, так і на Apple M-Серії. Впроваджено `SmartReader` з патерном Graceful Degradation для безперебійної обробки даних та універсальний `BaseTrainer` для стандартизації логування в MLflow та бере на себе рутину з Early Stopping.
 - **Concrete Strength (`HW 01`):** Регресійна задача на табличних даних. Розробка глибокого багатошарового перцептрона (MLP) з використанням `StandardScaler` для прогнозування міцності бетону (оцінка за MSE, MAE та R²).
 - **Intel Image Classification (`HW 02`):** Задачі класифікації зображень з використанням комп'ютерного зору. Застосування техніки Transfer Learning на базі попередньо навченої моделі `ResNet18` з налаштуванням аугментацій (RandomResizedCrop, ColorJitter).
+- **Indoor Objects Detection (`HW 03`):** Розв'язання задачі локалізації об'єктів у реальному часі. Імплементація SOTA-моделі `YOLO26s` (NMS-Free) для детекції об'єктів інтер'єру з покласовим аналізом метрики mAP50 та динамічною візуалізацією Bounding Boxes.
 - **Spam Detection (`HW 04`):** Порівняльне дослідження (Comparative Study) методів обробки природної мови. Еволюція від базових частотних мішків слів (BoW та TF-IDF) до попередньо навчених семантичних векторів `GloVe Word2Vec` з інтерактивним інференсом.
 - **Machine Translation (`HW 05`):** Занурення у складні генеративні архітектури NLP. Побудова моделі `Seq2Seq` (RNN Encoder-Decoder) з механізмом уваги (Bahdanau Attention) та візуалізацією Attention Heatmaps (матриць уваги) під час перекладу.
 - **Multimodal Fusion (`FP`):** Вершина інженерної думки курсу (Kaggle Challenge). Високопродуктивна *Tri-Framework* архітектура: `TensorFlow` (EfficientNetV2), `PyTorch` (CLIP, E5, MiniLM) та `Keras 3` (Late Fusion). Використовує ізольовані підпроцеси для екстракції ознак, 5-фолдовий OOF (Out-Of-Fold) стекінг з kNN/Ridge/HGB, та оптимізацію Quadratic Weighted Kappa (QWK) через Nelder-Mead з чесними порогами (Honest Thresholding).
@@ -134,6 +145,8 @@ goit-DL4CV-NLP-hw-set/
 ## 🪬 Швидкий старт
 
 Проект має **Zero-Config Boot**. Достатньо мати встановлений Python та утиліту GNU Make. 
+
+![Makefile](./img/Makefile.png)
 
 Щоб побачити повний список команд інфраструктури, виконайте у терміналі:
 

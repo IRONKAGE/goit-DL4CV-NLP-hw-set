@@ -24,7 +24,7 @@ def clean_text(text: str) -> str:
 def get_spam_data(test_size: float = 0.2, seed: int = 42) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Завантажує набір даних Email Spam Detection, нормалізує назви колонок,
-    очищує текст та виконує стратифікований Train/Val Split.
+    видаляє дублікати (Fix Data Leakage), очищує текст та виконує стратифікований Train/Val Split.
     """
     downloader = SecureDownloader(
         dataset_path="shantanudhakadd/email-spam-detection-dataset-classification",
@@ -45,6 +45,10 @@ def get_spam_data(test_size: float = 0.2, seed: int = 42) -> Tuple[pd.DataFrame,
         df = df.rename(columns={'Category': 'label', 'Message': 'text'})
 
     df = df[['label', 'text']].dropna()
+
+    # Видаляємо дублікати ПЕРЕД обробкою тексту та сплітом (Data Leakage Prevention)
+    df = df.drop_duplicates(subset=['text'], keep='first')
+
     df['clean_text'] = df['text'].apply(clean_text)
     df = df[df['clean_text'].str.len() > 0]
     df['target'] = df['label'].apply(lambda x: 1 if str(x).lower().strip() == 'spam' else 0)
