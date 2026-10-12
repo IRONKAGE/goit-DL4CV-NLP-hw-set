@@ -72,6 +72,7 @@ goit-DL4CV-NLP-hw-set/
 │   ├── hw_01_eda.py            # 🏗️ Аналіз рецептур бетону (Кореляційні матриці, Слайдери віку)
 │   ├── hw_02_eda.py            # 🖼️ Аналіз зображень пейзажів Intel (Розподіл класів, Зразки)
 │   ├── hw_04_eda.py            # 📧 Аналіз дисбалансу, порівняння NLP-векторизаторів та інтерактивне Demo
+│   ├── hw_05_eda.py            # 🌍 Аналіз паралельного корпусу (Source/Target Sentence Length)
 │   └── hw_fp_eda.py            # 🐶 Мультимодальний пайплайн (Tri-Framework: TF ⟷ PyTorch ⟷ Keras 3)
 │
 ├── hw_01_concrete/             # 🏗️ Проект 1: Concrete Strength Prediction (Регресія)
@@ -88,7 +89,14 @@ goit-DL4CV-NLP-hw-set/
 │   ├── data_adapter.py         # 🗃️ Векторизація тексту (BoW, TF-IDF) та завантаження ембедінгів GloVe Word2Vec
 │   ├── nlp_core.py             # 🧮 Інкапсулятор для роботи з Gensim та Mean Pooling
 │   ├── model.py                # 🧠 Універсальний класифікатор (MLP) для порівняння трьох NLP-підходів
-│   └── train.py                # 🚂 Тренування ансамблю моделей, порівняння ROC-AUC, Precision, F1 та авто-висновки
+│   ├── train.py                # 🚂 Тренування ансамблю моделей, порівняння ROC-AUC, Precision, F1 та авто-висновки
+│   └── ui_labels.py            # 🌍 Локалізація наборів даних для UI
+│
+├── hw_05_translation/          # 🌍 Проект 5: Machine Translation (Seq2Seq Attention)
+│   ├── data_adapter.py         # 🗃️ Генерація парних словників та паддінг-тензорів (Teacher Forcing Shift)
+│   ├── model.py                # 🧠 Архітектура RNN Encoder-Decoder з механізмом уваги (Bahdanau Attention)
+│   ├── train.py                # 🚂 Навчання, інтерактивний переклад та генерація Heatmap-матриці уваги
+│   └── ui_labels.py            # 🌍 Локалізація наборів даних для UI
 │
 ├── hw_fp_kaggle_petfinder/     # 🐶🐱 Фінальний Проект: Multimodal Ensemble (Kaggle)
 │   ├── data_adapter.py         # 🗃️ Pure Pandas/Numpy лоадер (схема-агностичне читання, генерація мета-ознак)
@@ -120,6 +128,7 @@ goit-DL4CV-NLP-hw-set/
 - **Concrete Strength (`HW 01`):** Регресійна задача на табличних даних. Розробка глибокого багатошарового перцептрона (MLP) з використанням `StandardScaler` для прогнозування міцності бетону (оцінка за MSE, MAE та R²).
 - **Intel Image Classification (`HW 02`):** Задачі класифікації зображень з використанням комп'ютерного зору. Застосування техніки Transfer Learning на базі попередньо навченої моделі `ResNet18` з налаштуванням аугментацій (RandomResizedCrop, ColorJitter).
 - **Spam Detection (`HW 04`):** Порівняльне дослідження (Comparative Study) методів обробки природної мови. Еволюція від базових частотних мішків слів (BoW та TF-IDF) до попередньо навчених семантичних векторів `GloVe Word2Vec` з інтерактивним інференсом.
+- **Machine Translation (`HW 05`):** Занурення у складні генеративні архітектури NLP. Побудова моделі `Seq2Seq` (RNN Encoder-Decoder) з механізмом уваги (Bahdanau Attention) та візуалізацією Attention Heatmaps (матриць уваги) під час перекладу.
 - **Multimodal Fusion (`FP`):** Вершина інженерної думки курсу (Kaggle Challenge). Високопродуктивна *Tri-Framework* архітектура: `TensorFlow` (EfficientNetV2), `PyTorch` (CLIP, E5, MiniLM) та `Keras 3` (Late Fusion). Використовує ізольовані підпроцеси для екстракції ознак, 5-фолдовий OOF (Out-Of-Fold) стекінг з kNN/Ridge/HGB, та оптимізацію Quadratic Weighted Kappa (QWK) через Nelder-Mead з чесними порогами (Honest Thresholding).
 
 ## 🪬 Швидкий старт
