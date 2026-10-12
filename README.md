@@ -23,7 +23,7 @@
 - [![torch 2.14.1](https://img.shields.io/badge/torch-2.14.1-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pypi.org/project/torch/2.14.1/) 🔸 Фундаментальний рушій обчислень. Завдяки модулю `core.hardware` автоматично утилізує Apple Metal Performance Shaders (MPS) або NVIDIA CUDA з fallback на CPU. Для збереження стабільності на **Legacy macOS (Intel x64 + AMD)** завдяки PEP 508 маркерам автоматично розгортається: [![torch 2.2.2](https://img.shields.io/badge/torch-2.2.2-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pypi.org/project/torch/2.2.2/)
 - [![transformers 5.0.0](https://img.shields.io/badge/transformers-5.0.0-FFD21E.svg?logo=huggingface&logoColor=black)](https://huggingface.co/docs/transformers/index) 🔸 SOTA-моделі (CLIP, E5, MiniLM) сумісні з PyTorch для побудови потужних NLP та Vision екстракторів.
 - [![torchvision 0.29.1](https://img.shields.io/badge/torchvision-0.29.1-150458.svg?logo=pytorch&logoColor=white)](https://pypi.org/project/torchvision/) 🔸 Робота з Computer Vision, трансформації даних та Transfer Learning (ResNet).
-- [![ultralytics 8.4.172](https://img.shields.io/badge/ultralytics-8.4.172-00A9E0.svg?logo=yolo&logoColor=white)](https://pypi.org/project/ultralytics/) 🔸 SOTA-фреймворк для детекції об'єктів та сегментації (YOLOv8/YOLOv9).
+- [![ultralytics 8.4.172](https://img.shields.io/badge/ultralytics-8.4.172-00A9E0.svg?logo=yolo&logoColor=white)](https://pypi.org/project/ultralytics/) 🔸 SOTA-фреймворк для детекції об'єктів та сегментації (YOLOv8/YOLOv9/YOLO26).
 - [![gensim 4.4.0](https://img.shields.io/badge/gensim-4.4.0-0194E2.svg?logo=shadow&logoColor=white)](https://pypi.org/project/gensim/) 🔸 Векторне моделювання семантики текстів (попередньо навчені Word2Vec/GloVe ембедінги).
 
 ### 🎨 EDA & UI Frameworks
@@ -71,6 +71,7 @@ goit-DL4CV-NLP-hw-set/
 ├── notebooks_eda/              # 📊 Інтерактивні Marimo-скрипти розвідувального аналізу (EDA)
 │   ├── hw_01_eda.py            # 🏗️ Аналіз рецептур бетону (Кореляційні матриці, Слайдери віку)
 │   ├── hw_02_eda.py            # 🖼️ Аналіз зображень пейзажів Intel (Розподіл класів, Зразки)
+│   ├── hw_04_eda.py            # 📧 Аналіз дисбалансу, порівняння NLP-векторизаторів та інтерактивне Demo
 │   └── hw_fp_eda.py            # 🐶 Мультимодальний пайплайн (Tri-Framework: TF ⟷ PyTorch ⟷ Keras 3)
 │
 ├── hw_01_concrete/             # 🏗️ Проект 1: Concrete Strength Prediction (Регресія)
@@ -82,6 +83,12 @@ goit-DL4CV-NLP-hw-set/
 │   ├── data_adapter.py         # 🗃️ DataLoader з аугментаціями (RandomResizedCrop, ColorJitter) та Train/Val Split
 │   ├── model.py                # 🧠 Transfer Learning на базі ResNet18 (заморожування вагів, нова FC-голова)
 │   └── ui_labels.py            # 🌍 Локалізація наборів даних для UI
+│
+├── hw_04_spam_nlp/             # 📧 Проект 4: Spam Detection (NLP Comparative Study)
+│   ├── data_adapter.py         # 🗃️ Векторизація тексту (BoW, TF-IDF) та завантаження ембедінгів GloVe Word2Vec
+│   ├── nlp_core.py             # 🧮 Інкапсулятор для роботи з Gensim та Mean Pooling
+│   ├── model.py                # 🧠 Універсальний класифікатор (MLP) для порівняння трьох NLP-підходів
+│   └── train.py                # 🚂 Тренування ансамблю моделей, порівняння ROC-AUC, Precision, F1 та авто-висновки
 │
 ├── hw_fp_kaggle_petfinder/     # 🐶🐱 Фінальний Проект: Multimodal Ensemble (Kaggle)
 │   ├── data_adapter.py         # 🗃️ Pure Pandas/Numpy лоадер (схема-агностичне читання, генерація мета-ознак)
@@ -111,7 +118,8 @@ goit-DL4CV-NLP-hw-set/
 
 - **MLOps Core (`/core`):** Архітектурне ядро. Включає автоматичну детекцію обладнання (`hardware.py`), яка змушує нейромережі працювати на максимумі як на RTX Pro 6000, так і на Apple M-Серії. Впроваджено `SmartReader` з патерном Graceful Degradation для безперебійної обробки даних та універсальний `BaseTrainer` для стандартизації логування в MLflow та бере на себе рутину з Early Stopping.
 - **Concrete Strength (`HW 01`):** Регресійна задача на табличних даних. Розробка глибокого багатошарового перцептрона (MLP) з використанням `StandardScaler` для прогнозування міцності бетону (оцінка за MSE, MAE та R²).
-- **Intel Image Classification (`HW 02`):** Задачі класифікації зображень з використанням комп'ютерного зору. Застосування техніки Transfer Learning на базі попередньо навченої моделі ResNet18 з налаштуванням аугментацій (RandomResizedCrop, ColorJitter).
+- **Intel Image Classification (`HW 02`):** Задачі класифікації зображень з використанням комп'ютерного зору. Застосування техніки Transfer Learning на базі попередньо навченої моделі `ResNet18` з налаштуванням аугментацій (RandomResizedCrop, ColorJitter).
+- **Spam Detection (`HW 04`):** Порівняльне дослідження (Comparative Study) методів обробки природної мови. Еволюція від базових частотних мішків слів (BoW та TF-IDF) до попередньо навчених семантичних векторів `GloVe Word2Vec` з інтерактивним інференсом.
 - **Multimodal Fusion (`FP`):** Вершина інженерної думки курсу (Kaggle Challenge). Високопродуктивна *Tri-Framework* архітектура: `TensorFlow` (EfficientNetV2), `PyTorch` (CLIP, E5, MiniLM) та `Keras 3` (Late Fusion). Використовує ізольовані підпроцеси для екстракції ознак, 5-фолдовий OOF (Out-Of-Fold) стекінг з kNN/Ridge/HGB, та оптимізацію Quadratic Weighted Kappa (QWK) через Nelder-Mead з чесними порогами (Honest Thresholding).
 
 ## 🪬 Швидкий старт
@@ -125,7 +133,7 @@ make
 ```
 
 > **Приклад типового пайплайну:**
-> 1. `make setup` (створить середовище та завантажить PyTorch).
+> 1. `make setup` (створить середовище та завантажить PyTorch/YOLO).
 > 2. `make eda-hw` (відкриє Marimo-дашборд для аналізу даних).
 > 3. `make mlflow` (відкриє дашборд з графіками навчання експерименту).
 
